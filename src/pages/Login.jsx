@@ -18,7 +18,8 @@ const Container = styled.div`
       rgba(255, 255, 255, 0.5),
       rgba(255, 255, 255, 0.5)
     ),
-    url("http://localhost:5000/images/auth/login.jpeg") center;
+    url("https://mern-ecommerce-backend.onrender.com/images/auth/login.jpeg")
+      center;
   background-size: cover;
   display: flex;
   align-items: center;
