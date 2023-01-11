@@ -1,4 +1,5 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import Announcement from "../components/Announcement";
 import Categories from "../components/Categories";
 import Footer from "../components/Footer";
@@ -8,6 +9,7 @@ import Products from "../components/Products";
 import Slider from "../components/Slider";
 
 function Home() {
+  window.scrollTo(0, 0);
   return (
     <div>
       <Announcement />

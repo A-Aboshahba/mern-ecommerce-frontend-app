@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styled from "styled-components";
 import Product from "./Product";
 import axios from "axios";
+import { userRequest } from "../requestMethods";
 const Container = styled.div`
   padding: 20px;
   display: flex;
@@ -10,17 +11,19 @@ const Container = styled.div`
 `;
 
 function Products({ cat, filters, sort }) {
-  console.log(cat, filters, sort);
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
   useEffect(() => {
     const getProducts = async () => {
       try {
-        const res = await axios.get(
-          cat
-            ? `http://localhost:5000/api/products?category=${cat}`
-            : "http://localhost:5000/api/products"
+        const res = await userRequest.get(
+          cat ? `products?category=${cat}` : "products"
         );
+        // const res = await axios.get(
+        //   cat
+        //     ? `${process.env.REACT_APP_BASE_URL}/api/products?category=${cat}`
+        //     : `${process.env.REACT_APP_BASE_URL}/api/products`
+        // );
         setProducts(res.data);
       } catch (err) {
         console.error(err);

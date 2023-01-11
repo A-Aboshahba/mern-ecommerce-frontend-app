@@ -9,9 +9,12 @@ import { mobile } from "../responsive";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { publicRequest } from "../requestMethods";
-import { addProduct } from "../redux/cartRedux";
-import { useDispatch } from "react-redux";
-
+import { addProduct, updateProduct } from "../redux/cartRedux";
+import { useDispatch, useSelector } from "react-redux";
+import Alert from "@mui/material/Alert";
+import Stack from "@mui/material/Stack";
+import axios from "axios";
+import HighlightOffTwoToneIcon from "@mui/icons-material/HighlightOffTwoTone";
 const Container = styled.div``;
 
 const Wrapper = styled.div`
@@ -72,6 +75,8 @@ const FilterColor = styled.div`
   width: 20px;
   height: 20px;
   border-radius: 50%;
+  border: ${(props) =>
+    props.selected === props.color ? "2px solid red" : "0.5px solid black"};
   background-color: ${(props) => props.color};
   margin: 0px 5px;
   cursor: pointer;
@@ -121,6 +126,10 @@ const Button = styled.button`
 `;
 
 export default function Product() {
+  window.scrollTo(0, 0);
+  const cart = useSelector((state) => state.cart);
+  const currentUser = useSelector((state) => state.user.currentUser);
+  const [addError, setAddError] = useState(null);
   const location = useLocation();
   const id = location.pathname.split("/")[2];
   const [product, setProduct] = useState({});
@@ -139,8 +148,83 @@ export default function Product() {
       setQuantity(quantity + 1);
     }
   };
-  const handleClick = () => {
-    dispatch(addProduct({ ...product, quantity, color, size }));
+  const chooseColor = (color) => {
+    setAddError(null);
+    setColor(color);
+  };
+  const chooseSize = (size) => {
+    setAddError(null);
+    setSize(size);
+  };
+  const handleClick = async () => {
+    if (color && size) {
+      product.cartPageId = product._id + color + size;
+      let alreadyThere = false;
+      cart.products.forEach((cartProduct) => {
+        if (cartProduct.cartPageId === product.cartPageId) {
+          alreadyThere = true;
+        }
+      });
+      if (alreadyThere) {
+        dispatch(
+          updateProduct({
+            cartPageId: product.cartPageId,
+            add_or_remove: quantity,
+            price: product.price * quantity,
+          })
+        );
+        if (currentUser) {
+          const update_Product_Form_Local_To_Db = await axios.put(
+            `${process.env.REACT_APP_BASE_URL}/api/carts/${currentUser._id}`,
+            {
+              cartId: cart.cartId,
+              cartPageId: product.cartPageId,
+              quantity: quantity,
+              price: product.price,
+            },
+            {
+              headers: {
+                token: `Bearer ${currentUser.accessToken}`,
+              },
+            }
+          );
+        }
+      } else {
+        dispatch(
+          addProduct({
+            ...product,
+            cartPageId: product._id + color + size,
+            quantity,
+            color,
+            size,
+          })
+        );
+        if (currentUser) {
+          const add_Product_Form_Local_To_Db = await axios.put(
+            `${process.env.REACT_APP_BASE_URL}/api/carts/product/${currentUser._id}`,
+            {
+              cartId: cart.cartId,
+              products: {
+                ...product,
+                cartPageId: product._id + color + size,
+                color,
+                size,
+                quantity,
+              },
+              quantity: 1,
+              total: quantity * product.price,
+            },
+            {
+              headers: {
+                token: `Bearer ${currentUser.accessToken}`,
+              },
+            }
+          );
+        }
+      }
+    } else {
+      setAddError(true);
+    }
   };
   useEffect(() => {
     const getProduct = async () => {
@@ -156,7 +240,13 @@ export default function Product() {
         <Announcement />
         <Wrapper>
           <ImgContainer>
-            <Image src={product.img} />
+            <Image
+              src={
+                process.env.REACT_APP_BASE_URL +
+                "/images/products/" +
+                product.img
+              }
+            />
           </ImgContainer>
           <InfoContainer>
             <Title>{product.title}</Title>
@@ -166,14 +256,26 @@ export default function Product() {
               <Filter>
                 <FilterTitle>Color:</FilterTitle>
                 {product.color?.map((c) => (
-                  <FilterColor color={c} key={c} onClick={() => setColor(c)} />
+                  <FilterColor
+                    color={c}
+                    key={c}
+                    selected={color}
+                    onClick={() => chooseColor(c)}
+                  />
                 ))}
+                <HighlightOffTwoToneIcon
+                  cursor="pointer"
+                  onClick={() => setColor("")}
+                />
               </Filter>
               <Filter>
                 <FilterTitle>Size:</FilterTitle>
-                <FilterSize onChange={(e) => setSize(e.target.value)}>
+                <FilterSize onChange={(e) => chooseSize(e.target.value)}>
+                  <option value="" label="size:"></option>
                   {product.size?.map((s) => (
-                    <FilterSizeOption key={s}>{s}</FilterSizeOption>
+                    <FilterSizeOption cursor="pointer" key={s}>
+                      {s}
+                    </FilterSizeOption>
                   ))}
                 </FilterSize>
               </Filter>
@@ -191,6 +293,13 @@ export default function Product() {
                 />
               </AmountContainer>
               <Button onClick={handleClick}>Add To Cart</Button>
+              {addError && (
+                <Stack sx={{ width: "100%" }} spacing={2}>
+                  <Alert severity="error">
+                    Please make sure to specify color and size.
+                  </Alert>
+                </Stack>
+              )}
             </AddContainer>
           </InfoContainer>
         </Wrapper>

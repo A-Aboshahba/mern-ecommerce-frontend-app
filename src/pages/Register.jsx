@@ -3,6 +3,10 @@ import { mobile } from "../responsive";
 import Announcement from "../components/Announcement";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { publicRequest } from "../requestMethods";
+import axios from "axios";
 
 const Container = styled.div`
   width: 100vw;
@@ -11,8 +15,7 @@ const Container = styled.div`
       rgba(255, 255, 255, 0.5),
       rgba(255, 255, 255, 0.5)
     ),
-    url("https://images.pexels.com/photos/6984661/pexels-photo-6984661.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940")
-      center;
+    url("http://localhost:5000/images/auth/login.jpeg") center;
   background-size: cover;
   display: flex;
   align-items: center;
@@ -58,6 +61,40 @@ const Button = styled.button`
 `;
 
 export default function Register() {
+  window.scrollTo(0, 0);
+  const firstName = useRef();
+  const lastName = useRef();
+  const username = useRef();
+  const email = useRef();
+  const password = useRef();
+  const passwordAgain = useRef();
+  const navigate = useNavigate();
+  const onChange = () => {
+    passwordAgain.current.setCustomValidity("");
+  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (passwordAgain.current.value !== password.current.value) {
+      passwordAgain.current.setCustomValidity("Passwords dont match!");
+      return;
+    } else {
+      console.log("HERREE");
+      const user = {
+        name: firstName.current.value + " " + lastName.current.value,
+        password: password.current.value,
+        username: username.current.value,
+        email: email.current.value,
+      };
+      try {
+        await publicRequest.post("/auth/register", {
+          ...user,
+        });
+        navigate("/login");
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
   return (
     <div>
       <Announcement />
@@ -65,18 +102,32 @@ export default function Register() {
       <Container>
         <Wrapper>
           <Title>CREATE AN ACCOUNT</Title>
-          <Form>
-            <Input placeholder="name" />
-            <Input placeholder="last name" />
-            <Input placeholder="username" />
-            <Input placeholder="email" />
-            <Input placeholder="password" />
-            <Input placeholder="confirm password" />
+          <Form onSubmit={handleSubmit}>
+            <Input placeholder="First name" required ref={firstName} />
+            <Input placeholder="Last name" required ref={lastName} />
+            <Input placeholder="username" required ref={username} />
+            <Input placeholder="email" type="email" required ref={email} />
+            <Input
+              placeholder="password"
+              type="password"
+              required
+              ref={password}
+              minLength="4"
+              onChange={onchange}
+            />
+            <Input
+              placeholder="confirm password"
+              required
+              type="password"
+              minLength="4"
+              ref={passwordAgain}
+              onChange={onChange}
+            />
             <Agreement>
               By creating an account, I consent to the processing of my personal
               data in accordance with the <b>PRIVACY POLICY</b>
             </Agreement>
-            <Button>CREATE</Button>
+            <Button type="submit">CREATE</Button>
           </Form>
         </Wrapper>
       </Container>

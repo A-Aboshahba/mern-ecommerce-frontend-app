@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import SearchIcon from "@mui/icons-material/Search";
 import Badge from "@mui/material/Badge";
@@ -7,12 +7,14 @@ import { mobile } from "../responsive";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logOut } from "../redux/userRedux";
+import { logOutCart } from "../redux/cartRedux";
 const Container = styled.div`
-  height: 60px;
+  background-color: #cafafe;
+  height: 50px;
   ${mobile({ height: "50px" })}
 `;
 const Wrapper = styled.div`
-  padding: 10px 20px;
+  padding: 6px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,7 +38,11 @@ const SearchContainer = styled.div`
   padding: 5px;
 `;
 const Input = styled.input`
+  background-color: #cafafe;
   border: none;
+  &:focus {
+    outline: none;
+  }
   ${mobile({ width: "50px" })}
 `;
 
@@ -65,6 +71,7 @@ const MenuItem = styled.div`
 `;
 
 function Navbar() {
+  const cart = useSelector((state) => state.cart);
   const quantity = useSelector((state) => state.cart.quantity);
   const currentUser = useSelector((state) => state.user.currentUser);
   const navigate = useNavigate();
@@ -74,6 +81,7 @@ function Navbar() {
   }
   function onSignout() {
     dispatch(logOut());
+    dispatch(logOutCart());
     navigate("/");
   }
   function onRegister() {
@@ -81,14 +89,6 @@ function Navbar() {
   }
   function goHome() {
     navigate("/");
-  }
-  function logged() {
-    if (currentUser) {
-      navigate("/cart");
-    } else {
-      window.alert("You should login first");
-      navigate("/login");
-    }
   }
   return (
     <Container>
@@ -104,15 +104,15 @@ function Navbar() {
           </SearchContainer>
         </Left>
         <Center>
-          <Logo onClick={goHome}>ABSHOHBA STORE</Logo>
+          <Logo onClick={goHome}>ABOSHOHBA STORE</Logo>
         </Center>
         <Right>
           {currentUser && <MenuItem onClick={onSignout}>SIGN OUT</MenuItem>}
           {!currentUser && <MenuItem onClick={onRegister}>REGISTER</MenuItem>}
           {!currentUser && <MenuItem onClick={onSignin}>SIGN IN</MenuItem>}
-          <Link to={currentUser ? "/cart" : "/login"}>
+          <Link to={"/cart"}>
             <MenuItem>
-              <Badge badgeContent={quantity} color="success" onClick={logged}>
+              <Badge badgeContent={quantity} color="success">
                 <ShoppingCartOutlinedIcon />
               </Badge>
             </MenuItem>

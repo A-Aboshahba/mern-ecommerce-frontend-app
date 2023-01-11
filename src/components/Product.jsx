@@ -64,10 +64,16 @@ function Product(props) {
   return (
     <Container>
       <Circle />
-      <Image src={props.item.img} />
+      <Image
+        src={
+          process.env.REACT_APP_BASE_URL + "/images/products/" + props.item.img
+        }
+      />
       <Info>
         <Icon>
-          <ShoppingCartOutlinedIcon />
+          <Link to={`/product/${props.item._id}`}>
+            <ShoppingCartOutlinedIcon />
+          </Link>
         </Icon>
         <Icon>
           <Link to={`/product/${props.item._id}`}>

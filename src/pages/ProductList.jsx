@@ -38,6 +38,7 @@ const Select = styled.select`
 const Option = styled.option``;
 
 export default function ProductList() {
+  window.scrollTo(0, 0);
   const location = useLocation();
   const cat = location.pathname.split("/")[2];
   const [filters, setFilters] = useState({});
@@ -68,11 +69,11 @@ export default function ProductList() {
           </Select>
           <Select name="size" onChange={handleFilters}>
             <Option disabled>Size</Option>
-            <Option>xs</Option>
-            <Option>s</Option>
-            <Option>m</Option>
-            <Option>l</Option>
-            <Option>xl</Option>
+            <Option>XS</Option>
+            <Option>S</Option>
+            <Option>M</Option>
+            <Option>L</Option>
+            <Option>XL</Option>
           </Select>
         </Filter>
         <Filter>
