@@ -1,10 +1,10 @@
 export const sliderItems = [
   {
     id: 1,
-    img: `${process.env.REACT_APP_BASE_URL}/images/slider/SUMMER_SALE.webp`,
+    img: `${process.env.REACT_APP_BASE_URL}/images/slider/LOUNGEWEAR_LOVE.png`,
     title: "SUMMER SALE",
     desc: "1- DON'T COMPROMISE ON STYLE! GET FLAT 30% OFF FOR NEW ARRIVALS.",
-    bg: "f5fafd",
+    bg: "fbf0f4",
   },
   {
     id: 2,
@@ -15,10 +15,11 @@ export const sliderItems = [
   },
   {
     id: 3,
-    img: `${process.env.REACT_APP_BASE_URL}/images/slider/LOUNGEWEAR_LOVE.png`,
+
+    img: `${process.env.REACT_APP_BASE_URL}/images/slider/SUMMER_SALE.webp`,
     title: "LOUNGEWEAR LOVE",
     desc: "3- DON'T COMPROMISE ON STYLE! GET FLAT 30% OFF FOR NEW ARRIVALS.",
-    bg: "fbf0f4",
+    bg: "ebd7c5",
   },
 ];
 
